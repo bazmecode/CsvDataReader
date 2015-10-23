@@ -14,6 +14,14 @@ namespace SqlUtilities
         // The DataReader should always be open when returned to the user.
         private bool _isClosed = false;
 
+        //setting to ignore errors
+        private bool _isIgnoreError = false;
+        private List<string> errors;
+
+        public List<string> getErrors()
+        {
+            return errors;
+        }
 
         private StreamReader _stream;
         private string[] _headers;
@@ -25,8 +33,15 @@ namespace SqlUtilities
         // have quotes around them and include embedded commas
         private Regex _CsvRegex = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))", RegexOptions.Compiled);
 
-        public CsvTestReader(string fileName)
+        public CsvTestReader(string fileName) : this(fileName, false)
         {
+
+        }
+
+        public CsvTestReader(string fileName, bool isIgnoreError)
+        {
+            _isIgnoreError = isIgnoreError;
+            errors = new List<string>();
             if (!File.Exists(fileName))
                 throw new FileNotFoundException();
 
@@ -43,7 +58,10 @@ namespace SqlUtilities
                 if (_currentRow.Length != _headers.Length)
                 {
                     _badRow = rawRow;
-                    return true;
+                    if (_isIgnoreError)
+                        errors.Add(_badRow);
+                    else
+                        return true;
                 }
 
             }

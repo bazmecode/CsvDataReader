@@ -44,6 +44,15 @@ namespace CsvDataReaderTest
         }
 
         [TestMethod]
+        public void ReadBadRowsIgnoreErrorEnabled()
+        {
+            CsvTestReader reader = new CsvTestReader(@"..\..\InvalidCsv.txt", true);
+            reader.Read();
+            Assert.AreEqual(3, reader.getErrors().Count);
+            reader.Close();
+        }
+
+        [TestMethod]
         public void ReadBadRowValues()
         {
             CsvTestReader reader = new CsvTestReader(@"..\..\InvalidCsv.txt");
